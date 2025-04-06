@@ -1,0 +1,12 @@
+---
+title: "Jiayin's website"
+image: "image/WechatIMG209.jpg"
+about:
+    template: jolla
+    links:
+        - icon: envelope
+          href: mailto:chenjenyy611@gmail.com
+        - icon: linkedin
+          href: https://www.linkedin.com/in/jiayin-chen-a63004173?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app
+
+---
