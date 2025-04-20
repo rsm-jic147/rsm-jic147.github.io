@@ -223,7 +223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Donation outcomes, including whether the individual gave and how much they gave.</p>
 <p>Demographic and donation history, such as gender, relationship status, number of years since the first donation, and prior donation frequency.</p>
 <p>Geographic and political context, with data on the political leaning of the recipient’s state and county (e.g., red/blue states), as well as census-linked socioeconomic indicators like median income, education, and urbanicity at the zip code level.</p>
-<div id="4b1680d5" class="cell" data-execution_count="1">
+<div id="13af7616" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the Stata file</span></span>
@@ -493,97 +493,103 @@ Variable Definitions
 <section id="balance-test" class="level3">
 <h3 class="anchored" data-anchor-id="balance-test">Balance Test</h3>
 <p>As an ad hoc test of the randomization mechanism, I provide a series of tests that compare aspects of the treatment and control groups to assess whether they are statistically significantly different from one another.</p>
-<div id="bb39496b" class="cell" data-execution_count="2">
+<div id="de855c4e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy <span class="im">import</span> stats</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop missing values</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>df_clean <span class="op">=</span> df[[<span class="st">'mrm2'</span>, <span class="st">'treatment'</span>]].dropna()</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Separate treatment and control groups</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>treat <span class="op">=</span> df_clean[df_clean[<span class="st">'treatment'</span>] <span class="op">==</span> <span class="dv">1</span>][<span class="st">'mrm2'</span>]</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>control <span class="op">=</span> df_clean[df_clean[<span class="st">'treatment'</span>] <span class="op">==</span> <span class="dv">0</span>][<span class="st">'mrm2'</span>]</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample sizes</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>n1 <span class="op">=</span> <span class="bu">len</span>(treat)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>n0 <span class="op">=</span> <span class="bu">len</span>(control)</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Means</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>mean1 <span class="op">=</span> treat.mean()</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>mean0 <span class="op">=</span> control.mean()</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Variances</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>var1 <span class="op">=</span> treat.var(ddof<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>var0 <span class="op">=</span> control.var(ddof<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># T-statistic (manual, class formula)</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>se <span class="op">=</span> np.sqrt(var1 <span class="op">/</span> n1 <span class="op">+</span> var0 <span class="op">/</span> n0)</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>t_stat <span class="op">=</span> (mean1 <span class="op">-</span> mean0) <span class="op">/</span> se</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>df_deg <span class="op">=</span> <span class="bu">min</span>(n1 <span class="op">-</span> <span class="dv">1</span>, n0 <span class="op">-</span> <span class="dv">1</span>)  <span class="co"># degrees of freedom</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>p_val <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> stats.t.cdf(<span class="bu">abs</span>(t_stat), df_deg))</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Manual t-test ==="</span>)</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Treatment mean: </span><span class="sc">{</span>mean1<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Control mean: </span><span class="sc">{</span>mean0<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"t-statistic: </span><span class="sc">{</span>t_stat<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"p-value: </span><span class="sc">{</span>p_val<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co"># === Linear Regression ===</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(df_clean[<span class="st">'treatment'</span>])</span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df_clean[<span class="st">'mrm2'</span>]</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> sm.OLS(y, X).fit()</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== Regression Output ==="</span>)</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Variables to test for balance</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>variables <span class="op">=</span> [<span class="st">'mrm2'</span>, <span class="st">'freq'</span>, <span class="st">'years'</span>, <span class="st">'female'</span>, <span class="st">'ave_hh_sz'</span>, <span class="st">'median_hhincome'</span>]</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Balance Check: Treatment vs Control ===</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> var <span class="kw">in</span> variables:</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Drop missing for current variable</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    df_clean <span class="op">=</span> df[[var, <span class="st">'treatment'</span>]].dropna()</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Split by group</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    treat <span class="op">=</span> df_clean[df_clean[<span class="st">'treatment'</span>] <span class="op">==</span> <span class="dv">1</span>][var]</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    control <span class="op">=</span> df_clean[df_clean[<span class="st">'treatment'</span>] <span class="op">==</span> <span class="dv">0</span>][var]</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Sample sizes</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    n1 <span class="op">=</span> <span class="bu">len</span>(treat)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    n0 <span class="op">=</span> <span class="bu">len</span>(control)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Means</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    mean1 <span class="op">=</span> treat.mean()</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    mean0 <span class="op">=</span> control.mean()</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Variances</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    var1 <span class="op">=</span> treat.var(ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    var0 <span class="op">=</span> control.var(ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># T-statistic</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    se <span class="op">=</span> np.sqrt(var1 <span class="op">/</span> n1 <span class="op">+</span> var0 <span class="op">/</span> n0)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    t_stat <span class="op">=</span> (mean1 <span class="op">-</span> mean0) <span class="op">/</span> se</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    df_deg <span class="op">=</span> <span class="bu">min</span>(n1 <span class="op">-</span> <span class="dv">1</span>, n0 <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    p_val <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> stats.t.cdf(<span class="bu">abs</span>(t_stat), df_deg))</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Print results</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Variable: </span><span class="sc">{</span>var<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Control Mean:   </span><span class="sc">{</span>mean0<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Treatment Mean: </span><span class="sc">{</span>mean1<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  t-statistic:    </span><span class="sc">{</span>t_stat<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  p-value:        </span><span class="sc">{</span>p_val<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Statistically significant? </span><span class="sc">{</span><span class="st">'YES'</span> <span class="cf">if</span> p_val <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="cf">else</span> <span class="st">'NO'</span><span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>=== Manual t-test ===
-Treatment mean: 13.012
-Control mean: 12.998
-t-statistic: 0.120
-p-value: 0.9049
+<pre><code>=== Balance Check: Treatment vs Control ===
 
-=== Regression Output ===
-                            OLS Regression Results                            
-==============================================================================
-Dep. Variable:                   mrm2   R-squared:                       0.000
-Model:                            OLS   Adj. R-squared:                 -0.000
-Method:                 Least Squares   F-statistic:                   0.01428
-Date:                Sun, 20 Apr 2025   Prob (F-statistic):              0.905
-Time:                        15:28:34   Log-Likelihood:            -1.9585e+05
-No. Observations:               50082   AIC:                         3.917e+05
-Df Residuals:                   50080   BIC:                         3.917e+05
-Df Model:                           1                                         
-Covariance Type:            nonrobust                                         
-==============================================================================
-                 coef    std err          t      P&gt;|t|      [0.025      0.975]
-------------------------------------------------------------------------------
-const         12.9981      0.094    138.979      0.000      12.815      13.181
-treatment      0.0137      0.115      0.119      0.905      -0.211       0.238
-==============================================================================
-Omnibus:                     8031.352   Durbin-Watson:                   2.004
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):            12471.135
-Skew:                           1.163   Prob(JB):                         0.00
-Kurtosis:                       3.751   Cond. No.                         3.23
-==============================================================================
+Variable: mrm2
+  Control Mean:   12.998
+  Treatment Mean: 13.012
+  t-statistic:    0.120
+  p-value:        0.9049
+  Statistically significant? NO
 
-Notes:
-[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
+Variable: freq
+  Control Mean:   8.047
+  Treatment Mean: 8.035
+  t-statistic:    -0.111
+  p-value:        0.9117
+  Statistically significant? NO
+
+Variable: years
+  Control Mean:   6.136
+  Treatment Mean: 6.078
+  t-statistic:    -1.091
+  p-value:        0.2753
+  Statistically significant? NO
+
+Variable: female
+  Control Mean:   0.283
+  Treatment Mean: 0.275
+  t-statistic:    -1.754
+  p-value:        0.0795
+  Statistically significant? NO
+
+Variable: ave_hh_sz
+  Control Mean:   2.427
+  Treatment Mean: 2.430
+  t-statistic:    0.823
+  p-value:        0.4103
+  Statistically significant? NO
+
+Variable: median_hhincome
+  Control Mean:   54921.094
+  Treatment Mean: 54763.169
+  t-statistic:    -0.743
+  p-value:        0.4573
+  Statistically significant? NO
+</code></pre>
 </div>
 </div>
-<p>Both the manual t-test and the linear regression show that there is no statistically significant difference in mrm2 (months since last donation) between the treatment and control groups:</p>
+<p>Each of these variables shows no statistically significant difference at the 95% confidence level, including female, which has the lowest p-value (0.0795) but still does not cross the conventional threshold for significance.</p>
+<p>These findings replicate the results shown in Table 1 of Karlan &amp; List (2007). The table in the original paper is designed to demonstrate that randomization worked: treatment and control groups are statistically equivalent in expectation across observable characteristics.</p>
+<p>By showing balance across variables like mrm2, freq, female, and neighborhood demographics (median_hhincome, ave_hh_sz), we can be confident that:</p>
 <ul>
-<li>Treatment group mean: 13.012</li>
-<li>Control group mean: 12.998</li>
-<li>t-statistic: 0.12</li>
-<li>p-value: 0.905</li>
-</ul>
-<p>In the regression, the estimated coefficient on treatment is 0.0137 with a p-value of 0.905, confirming the same result: no significant difference.</p>
-<p>This matches the findings in Table 1 of Karlan &amp; List (2007), which reports that mrm2 (listed as Number of months since last donation) has nearly identical means between treatment (13.012) and control (12.998) groups.</p>
-<p>Table 1 in the paper is significant as it shows randomization worked.Random assignment should ensure that treatment and control groups are statistically equivalent in expectation on all pre-treatment characteristics. By showing that variables like mrm2, freq, female, etc. are not significantly different, the authors give readers confidence that:</p>
-<ul>
-<li>There’s no selection bias</li>
-<li>Any differences in donation outcomes (like gave or amount) can be causally attributed to the treatment</li>
+<li><p>There is no selection bias</p></li>
+<li><p>Any differences in donation outcomes observed later can be causally attributed to the treatment</p></li>
 </ul>
 </section>
 </section>
@@ -592,7 +598,7 @@ Notes:
 <section id="charitable-contribution-made" class="level3">
 <h3 class="anchored" data-anchor-id="charitable-contribution-made">Charitable Contribution Made</h3>
 <p>First, I analyze whether matched donations lead to an increased response rate of making a donation.</p>
-<div id="2c942885" class="cell" data-execution_count="3">
+<div id="f1713f2d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">## bar plot</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -624,7 +630,7 @@ Notes:
 </div>
 </div>
 </div>
-<div id="3e90c5f5" class="cell" data-execution_count="4">
+<div id="bcadee30" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># t-tes</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># T-test and regression for the binary outcome 'gave'</span></span>
@@ -701,7 +707,7 @@ P-value:                          0.0019</code></pre>
 </ul>
 <p>From a behavioral perspective, this suggests: - People are more likely to give when they believe their donation will be matched — it increases the perceived impact of their gift. - This change in behavior is not driven by financial incentives alone (since the match isn’t actually paid to them) but by psychological framing and the feeling that their donation will be “worth more.”</p>
 <p>In the context of the Karlan &amp; List study, this result supports the idea that small nudges, such as the presence of a matching grant, can meaningfully shift behavior — a key finding for fundraisers and behavioral economists alike.</p>
-<div id="1ca370bb" class="cell" data-execution_count="5">
+<div id="81580d67" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">## replicate of table 3</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
@@ -736,7 +742,7 @@ treatment        0.007036  </code></pre>
 <section id="differences-between-match-rates" class="level3">
 <h3 class="anchored" data-anchor-id="differences-between-match-rates">Differences between Match Rates</h3>
 <p>Next, I assess the effectiveness of different sizes of matched donations on the response rate.</p>
-<div id="7013287a" class="cell" data-execution_count="6">
+<div id="8f96746b" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># t-test</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">'ratio'</span>].unique())</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -807,7 +813,7 @@ Categories (4, object): ['Control' &lt; 1 &lt; 2 &lt; 3]
 <p>The results fully support the authors’ interpretation on page 8.</p>
 <p>“While the match treatments relative to a control group increase the probability of donating, larger match ratios—$3:$1 and $2:$1—relative to a smaller match ratio ($1:$1) have no additional impact.”</p>
 <p>Even though the donation rates numerically increase with larger match ratios, the t-tests show these increases are not statistically significant.</p>
-<div id="5ab69b63" class="cell" data-execution_count="7">
+<div id="604fca23" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter dataset: keep all rows with non-null 'gave' and any valid 'ratio'</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>df_ratio_all <span class="op">=</span> df[df[<span class="st">'gave'</span>].notnull() <span class="op">&amp;</span> df[<span class="st">'ratio'</span>].isin([<span class="st">'Control'</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])].copy()</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -826,7 +832,7 @@ Dep. Variable:                   gave   R-squared:                       0.000
 Model:                            OLS   Adj. R-squared:                  0.000
 Method:                 Least Squares   F-statistic:                     3.665
 Date:                Sun, 20 Apr 2025   Prob (F-statistic):             0.0118
-Time:                        15:28:34   Log-Likelihood:                 26630.
+Time:                        15:41:53   Log-Likelihood:                 26630.
 No. Observations:               50083   AIC:                        -5.325e+04
 Df Residuals:                   50079   BIC:                        -5.322e+04
 Df Model:                           3                                         
@@ -856,7 +862,7 @@ Notes:
 <li><p>The coefficients for 1:1, 2:1, and 3:1 indicate how much more likely someone is to donate under each match condition compared to control.</p></li>
 </ul>
 <p>If these coefficients are statistically significant, we can conclude that the corresponding match offer increased the likelihood of giving relative to the control group.</p>
-<div id="71887651" class="cell" data-execution_count="8">
+<div id="68f60451" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># data vs. regression</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Direct differences from the data</span></span>
@@ -894,7 +900,7 @@ Notes:
 <section id="size-of-charitable-contribution" class="level3">
 <h3 class="anchored" data-anchor-id="size-of-charitable-contribution">Size of Charitable Contribution</h3>
 <p>In this subsection, I analyze the effect of the size of matched donation on the size of the charitable contribution.</p>
-<div id="06c34b54" class="cell" data-execution_count="9">
+<div id="d7eb15b5" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># t-test  vs bivariate</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for treatment and control groups with valid donation amounts</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>df_amount <span class="op">=</span> df[df[<span class="st">'amount'</span>].notnull() <span class="op">&amp;</span> df[<span class="st">'treatment'</span>].isin([<span class="dv">0</span>, <span class="dv">1</span>])]</span>
@@ -953,7 +959,7 @@ p-value:              0.0628
 </div>
 <p>This analysis helps us understand whether the treatment affects not just the likelihood of donating, but also how much people give. The results from both the t-test and regression show that people in the treatment group donate about $0.15 more on average than those in the control group. However, this difference is only marginally statistically significant (p ≈ 0.06), and the confidence interval includes zero.</p>
 <p>From this, we learn that while the treatment (a matching offer) strongly influences whether people donate, it has a much weaker and less certain effect on the amount given. This suggests that the psychological nudge of a match offer may primarily work by encouraging participation — getting more people to donate — rather than motivating donors to give significantly more money.</p>
-<div id="a5349167" class="cell" data-execution_count="10">
+<div id="2780d797" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">## limited to donate</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter to include only donors (gave = 1) with valid amount and treatment status</span></span>
@@ -1014,7 +1020,7 @@ p-value:                   0.5615
 <p>Does the Coefficient Have a Causal Interpretation?</p>
 <p>No — this coefficient does not have a causal interpretation. By restricting the analysis to donors only, we introduce selection bias, because treatment status may influence the likelihood of appearing in this subset (i.e., whether someone donates). Since the treatment affects who is included in the analysis, the estimated difference in donation amounts is not a valid causal estimate.</p>
 <p>Instead, this result is descriptive: it tells us that among donors, there is no significant difference in how much people gave depending on whether they were in the treatment group or not.</p>
-<div id="d52cfbc9" class="cell" data-execution_count="11">
+<div id="0d5856bb" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">## make 2 plot</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for donors with non-zero donation amounts and treatment assignment</span></span>
@@ -1066,7 +1072,7 @@ p-value:                   0.5615
 <p>As a reminder of how the t-statistic “works,” in this section I use simulation to demonstrate the Law of Large Numbers and the Central Limit Theorem.</p>
 <p>Suppose the true distribution of respondents who do not get a charitable donation match is Bernoulli with probability p=0.018 that a donation is made.</p>
 <p>Further suppose that the true distribution of respondents who do get a charitable donation match of any size is Bernoulli with probability p=0.022 that a donation is made.</p>
-<div id="f6650aa4" class="cell" data-execution_count="12">
+<div id="6508c5a0" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameters</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>p_control <span class="op">=</span> <span class="fl">0.018</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>p_treatment <span class="op">=</span> <span class="fl">0.022</span></span>
@@ -1113,7 +1119,7 @@ p-value:                   0.5615
 <p>The Central Limit Theorem explains why the distribution of these sample differences is approximately normal, even though the underlying data are binary (non-normal). This justifies using t-tests and confidence intervals in practice.</p>
 <section id="law-of-large-numbers" class="level3">
 <h3 class="anchored" data-anchor-id="law-of-large-numbers">Law of Large Numbers</h3>
-<div id="cfae63eb" class="cell" data-execution_count="13">
+<div id="563b6f61" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulation parameters</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>p_control <span class="op">=</span> <span class="fl">0.018</span></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>p_treatment <span class="op">=</span> <span class="fl">0.022</span></span>
@@ -1168,7 +1174,7 @@ p-value:                   0.5615
 </section>
 <section id="central-limit-theorem" class="level3">
 <h3 class="anchored" data-anchor-id="central-limit-theorem">Central Limit Theorem</h3>
-<div id="28de2193" class="cell" data-execution_count="14">
+<div id="dfc6e9d9" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameters</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>p_control <span class="op">=</span> <span class="fl">0.018</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>p_treatment <span class="op">=</span> <span class="fl">0.022</span></span>

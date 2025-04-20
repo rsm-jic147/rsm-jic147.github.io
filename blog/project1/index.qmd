@@ -112,61 +112,57 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 import statsmodels.api as sm
-# Drop missing values
-df_clean = df[['mrm2', 'treatment']].dropna()
 
-# Separate treatment and control groups
-treat = df_clean[df_clean['treatment'] == 1]['mrm2']
-control = df_clean[df_clean['treatment'] == 0]['mrm2']
+# Variables to test for balance
+variables = ['mrm2', 'freq', 'years', 'female', 'ave_hh_sz', 'median_hhincome']
 
-# Sample sizes
-n1 = len(treat)
-n0 = len(control)
+print("=== Balance Check: Treatment vs Control ===\n")
 
-# Means
-mean1 = treat.mean()
-mean0 = control.mean()
+for var in variables:
+    # Drop missing for current variable
+    df_clean = df[[var, 'treatment']].dropna()
 
-# Variances
-var1 = treat.var(ddof=1)
-var0 = control.var(ddof=1)
+    # Split by group
+    treat = df_clean[df_clean['treatment'] == 1][var]
+    control = df_clean[df_clean['treatment'] == 0][var]
 
-# T-statistic (manual, class formula)
-se = np.sqrt(var1 / n1 + var0 / n0)
-t_stat = (mean1 - mean0) / se
-df_deg = min(n1 - 1, n0 - 1)  # degrees of freedom
-p_val = 2 * (1 - stats.t.cdf(abs(t_stat), df_deg))
+    # Sample sizes
+    n1 = len(treat)
+    n0 = len(control)
 
-print("=== Manual t-test ===")
-print(f"Treatment mean: {mean1:.3f}")
-print(f"Control mean: {mean0:.3f}")
-print(f"t-statistic: {t_stat:.3f}")
-print(f"p-value: {p_val:.4f}")
+    # Means
+    mean1 = treat.mean()
+    mean0 = control.mean()
 
-# === Linear Regression ===
-X = sm.add_constant(df_clean['treatment'])
-y = df_clean['mrm2']
-model = sm.OLS(y, X).fit()
+    # Variances
+    var1 = treat.var(ddof=1)
+    var0 = control.var(ddof=1)
 
-print("\n=== Regression Output ===")
-print(model.summary())
+    # T-statistic
+    se = np.sqrt(var1 / n1 + var0 / n0)
+    t_stat = (mean1 - mean0) / se
+    df_deg = min(n1 - 1, n0 - 1)
+    p_val = 2 * (1 - stats.t.cdf(abs(t_stat), df_deg))
+
+    # Print results
+    print(f"Variable: {var}")
+    print(f"  Control Mean:   {mean0:.3f}")
+    print(f"  Treatment Mean: {mean1:.3f}")
+    print(f"  t-statistic:    {t_stat:.3f}")
+    print(f"  p-value:        {p_val:.4f}")
+    print(f"  Statistically significant? {'YES' if p_val < 0.05 else 'NO'}\n")
 
 ```
-Both the manual t-test and the linear regression show that there is no statistically significant difference in mrm2 (months since last donation) between the treatment and control groups:
 
-- Treatment group mean: 13.012
-- Control group mean: 12.998
-- t-statistic: 0.12
-- p-value: 0.905
+Each of these variables shows no statistically significant difference at the 95% confidence level, including female, which has the lowest p-value (0.0795) but still does not cross the conventional threshold for significance.
 
-In the regression, the estimated coefficient on treatment is 0.0137 with a p-value of 0.905, confirming the same result: no significant difference.
+These findings replicate the results shown in Table 1 of Karlan & List (2007). The table in the original paper is designed to demonstrate that randomization worked: treatment and control groups are statistically equivalent in expectation across observable characteristics.
 
-This matches the findings in Table 1 of Karlan & List (2007), which reports that mrm2 (listed as Number of months since last donation) has nearly identical means between treatment (13.012) and control (12.998) groups.
+By showing balance across variables like mrm2, freq, female, and neighborhood demographics (median_hhincome, ave_hh_sz), we can be confident that:
 
-Table 1 in the paper is significant as it shows randomization worked.Random assignment should ensure that treatment and control groups are statistically equivalent in expectation on all pre-treatment characteristics. By showing that variables like mrm2, freq, female, etc. are not significantly different, the authors give readers confidence that:
+- There is no selection bias
 
-- There’s no selection bias
-- Any differences in donation outcomes (like gave or amount) can be causally attributed to the treatment
+- Any differences in donation outcomes observed later can be causally attributed to the treatment
 
 
 ## Experimental Results
