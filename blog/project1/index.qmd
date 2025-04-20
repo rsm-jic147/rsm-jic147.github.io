@@ -357,44 +357,51 @@ The results fully support the authors' interpretation on page 8.
 "While the match treatments relative to a control group increase the probability of donating, larger match ratios—$3:$1 and $2:$1—relative to a smaller match ratio ($1:$1) have no additional impact."
 
 Even though the donation rates numerically increase with larger match ratios, the t-tests show these increases are not statistically significant. 
+
 ```{python}
-# regression
-# Filter treatment group and create dummy variables
-df_ratio_reg = df[(df['treatment'] == 1) & (df['gave'].notnull()) & (df['ratio'].isin([1, 2, 3]))].copy()
+# Filter dataset: keep all rows with non-null 'gave' and any valid 'ratio'
+df_ratio_all = df[df['gave'].notnull() & df['ratio'].isin(['Control', 1, 2, 3])].copy()
 
-df_ratio_reg['ratio1'] = (df_ratio_reg['ratio'] == 1).astype(int)
-df_ratio_reg['ratio2'] = (df_ratio_reg['ratio'] == 2).astype(int)
-df_ratio_reg['ratio3'] = (df_ratio_reg['ratio'] == 3).astype(int)
+# Ensure 'ratio' is treated as a categorical variable
+df_ratio_all['ratio'] = df_ratio_all['ratio'].astype('category')
 
-# Regression: gave ~ ratio2 + ratio3 (baseline is 1:1)
-import statsmodels.formula.api as smf
-model = smf.ols('gave ~ ratio2 + ratio3', data=df_ratio_reg).fit()
+# Run regression with ratio as a categorical predictor
+model = smf.ols('gave ~ C(ratio)', data=df_ratio_all).fit()
+
+# Display results
 print(model.summary())
 ```
 
-To assess whether larger match ratios increase the likelihood of donating, I ran a linear probability regression of gave on dummy variables for the 2:1 and 3:1 match ratios (with 1:1 as the baseline). The results show small positive coefficients for both 2:1 (0.0019) and 3:1 (0.0020) match rates, but neither is statistically significant (p > 0.3). This indicates that while higher match ratios slightly increase donation rates, the differences are not meaningful. These findings support the authors’ interpretation that increasing the match ratio beyond 1:1 does not significantly affect the probability of donating.
+To assess how different match ratios affect the likelihood of donating, I ran a linear regression of gave (a binary indicator for whether a person donated) on a categorical variable representing the match ratio. This includes the control group (no match), as well as the 1:1, 2:1, and 3:1 match conditions.
+
+The regression treats the control group as the baseline category. The coefficients on the 1:1, 2:1, and 3:1 match indicators reflect the difference in donation rates compared to the control group.
+
+- The intercept represents the average donation rate in the control group (i.e., the probability of giving when no match is offered).
+
+- The coefficients for 1:1, 2:1, and 3:1 indicate how much more likely someone is to donate under each match condition compared to control.
+
+If these coefficients are statistically significant, we can conclude that the corresponding match offer increased the likelihood of giving relative to the control group.
 
 ```{python}
 # data vs. regression
 
-# Step 1: Compute response rate differences directly from the data
-direct_diff_21_vs_11 = gave_2to1.mean() - gave_1to1.mean()
-direct_diff_31_vs_21 = gave_3to1.mean() - gave_2to1.mean()
+# Step 1: Direct differences from the data
+gave_1 = df_ratio_all[df_ratio_all['ratio'] == 1]['gave']
+gave_2 = df_ratio_all[df_ratio_all['ratio'] == 2]['gave']
+gave_3 = df_ratio_all[df_ratio_all['ratio'] == 3]['gave']
 
-# Step 2: Compute the differences in coefficients from regression
-# Since ratio1 (1:1) is the baseline, it has a coefficient of 0
-# So: ratio2 - ratio1 = coef_ratio2, ratio3 - ratio2 = coef_ratio3 - coef_ratio2
-reg_diff_21_vs_11 = model.params['ratio2']
-reg_diff_31_vs_21 = model.params['ratio3'] - model.params['ratio2']
+direct_diff_21_vs_11 = gave_2.mean() - gave_1.mean()
+direct_diff_31_vs_21 = gave_3.mean() - gave_2.mean()
 
-# Format results
-{
-    "Direct Difference (2:1 vs 1:1)": direct_diff_21_vs_11,
-    "Direct Difference (3:1 vs 2:1)": direct_diff_31_vs_21,
-    "Regression Coeff. Diff (2:1 vs 1:1)": reg_diff_21_vs_11,
-    "Regression Coeff. Diff (3:1 vs 2:1)": reg_diff_31_vs_21
-}
+# Step 2: Use regression coefficients (relative to Control group)
+coef_1 = model.params.get('C(ratio)[T.1]', 0)
+coef_2 = model.params.get('C(ratio)[T.2]', 0)
+coef_3 = model.params.get('C(ratio)[T.3]', 0)
 
+reg_diff_21_vs_11 = coef_2 - coef_1
+reg_diff_31_vs_21 = coef_3 - coef_2
+
+# Print results
 print("=== Response Rate Differences ===")
 print(f"2:1 vs 1:1 (Direct from data):       {direct_diff_21_vs_11:.4%}")
 print(f"3:1 vs 2:1 (Direct from data):       {direct_diff_31_vs_21:.4%}")
