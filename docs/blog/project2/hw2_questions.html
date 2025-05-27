@@ -258,7 +258,7 @@ window.Quarto = {
 <li><code>region</code>: Categorical variable representing the firm’s geographical location.</li>
 <li><code>iscustomer</code>: Binary indicator (1 if the firm is a Blueprinty customer, 0 otherwise).</li>
 </ul>
-<div id="b77b4183" class="cell" data-execution_count="1">
+<div id="c9889525" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>blueprinty <span class="op">=</span> pd.read_csv(<span class="st">"blueprinty.csv"</span>)</span>
@@ -326,7 +326,7 @@ window.Quarto = {
 <p>To investigate whether Blueprinty customers tend to have more patents, we compared the distribution of <code>patents</code> for customers vs.&nbsp;non-customers both <strong>visually</strong> and <strong>numerically</strong>. To begin, we grouped the dataset by customer status (<code>iscustomer</code>) and calculated the average number of patents. The results show that <strong>Blueprinty customers average 4.13 patents</strong>, compared to <strong>3.47 patents for non-customers</strong>. This suggests a potential positive association between software usage and innovation outcomes.</p>
 <p>To visualize this relationship, we created a histogram of patent counts stratified by customer status. Both groups display a <strong>right-skewed distribution</strong>, typical of count data like patents. However, the histogram shows that <strong>Blueprinty customers are more concentrated at higher patent counts</strong>, with their distribution clearly shifted to the right relative to non-customers. This provides initial descriptive support for the hypothesis that Blueprinty software may enhance innovation performance.</p>
 <p>This preliminary finding suggests a potential positive association between customer status and patent count, which will be investigated further using Poisson regression.</p>
-<div id="7954759e" class="cell" data-execution_count="2">
+<div id="ba858310" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -379,7 +379,7 @@ window.Quarto = {
 <p>Blueprinty customers are not selected at random. It may be important to account for systematic differences in the age and regional location of customers vs non-customers.</p>
 <p>To assess whether Blueprinty customers differ systematically from non-customers, we explored variation in geographic region by customer status. This is an important step in evaluating potential confounding variables, which could bias the observed relationship between software usage and patent outcomes.</p>
 <p>We visualized the regional distribution of firms across customer categories using a bar chart. The results reveal a clear pattern: the Northeast region accounts for a disproportionately high number of Blueprinty customers, while other regions — including the Midwest, Northwest, South, and Southwest — are more heavily populated by non-customers. This suggests that customer status is not randomly assigned with respect to geography.</p>
-<div id="1a6b655b" class="cell" data-execution_count="3">
+<div id="ffe04df9" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare average age by customer status</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>age <span class="op">=</span> blueprinty.groupby(<span class="st">"iscustomer"</span>)[<span class="st">"age"</span>]</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -430,7 +430,7 @@ f(Y_i \mid \lambda) = \frac{e^{-\lambda} \lambda^{Y_i}}{Y_i!}
 \log \mathcal{L}(\lambda) = \sum_{i=1}^{n} \left( -\lambda + Y_i \log(\lambda) - \log(Y_i!) \right)
 \]</span></p>
 <p>This log-likelihood will be the basis for estimating the parameter <span class="math inline">\(\lambda\)</span> using Maximum Likelihood Estimation.</p>
-<div id="11e1037f" class="cell" data-execution_count="4">
+<div id="c2c8e3e5" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> gammaln</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -452,7 +452,7 @@ f(Y_i \mid \lambda) = \frac{e^{-\lambda} \lambda^{Y_i}}{Y_i!}
 <span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    log_likelihood <span class="op">=</span> np.<span class="bu">sum</span>(<span class="op">-</span>lmbda <span class="op">+</span> y <span class="op">*</span> np.log(lmbda) <span class="op">-</span> gammaln(y <span class="op">+</span> <span class="dv">1</span>))</span>
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> log_likelihood</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="2a26c7ca" class="cell" data-execution_count="5">
+<div id="c3fb12c6" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Log-likelihood function</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> poisson_log_likelihood(lmbda, y):</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> lmbda <span class="op">&lt;=</span> <span class="dv">0</span>:</span>
@@ -511,7 +511,7 @@ f(Y_i \mid \lambda) = \frac{e^{-\lambda} \lambda^{Y_i}}{Y_i!}
 <p><span class="math display">\[
 \lambda_{\text{MLE}} = \bar{y}
 \]</span></p>
-<div id="442b484c" class="cell" data-execution_count="6">
+<div id="662407e4" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lambda_mle_analytical <span class="op">=</span> np.mean(y_data)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Analytical MLE for λ = </span><span class="sc">{</span>lambda_mle_analytical<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -522,7 +522,7 @@ f(Y_i \mid \lambda) = \frac{e^{-\lambda} \lambda^{Y_i}}{Y_i!}
 <section id="interpretation" class="level3">
 <h3 class="anchored" data-anchor-id="interpretation">Interpretation</h3>
 <p>The MLE for ( ) is simply the sample mean ( {Y} ), which aligns with our intuition. Since the Poisson distribution has mean ( ), it’s natural that the average observed count provides the</p>
-<div id="396c1eec" class="cell" data-execution_count="7">
+<div id="c6d5d782" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize_scalar</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define negative log-likelihood to minimize</span></span>
@@ -555,7 +555,7 @@ Y_i \sim \text{Poisson}(\lambda_i), \quad \text{where } \lambda_i = \exp(X_i^\to
 <p>This specification assumes that the log of the expected number of patents is a linear function of covariates.</p>
 <p>To operationalize this, I constructed a design matrix ( X ) that includes firm age, age squared (to capture non-linear effects), a binary indicator for whether the firm is a Blueprinty customer, and dummy variables for region (with one region omitted as the reference group). I then defined a log-likelihood function for the Poisson model and used <code>scipy.optimize.minimize</code> with the BFGS method to estimate the vector of coefficients ( ). I included a clipping step on the linear predictor to avoid numerical overflow when exponentiating large values.</p>
 <p>After optimization, I extracted the maximum likelihood estimates for each coefficient as well as the standard errors from the inverse Hessian matrix. These results are presented in a summary table showing the effect of each covariate on the expected number of patents. This regression framework allows us to estimate the adjusted association between Blueprinty usage and innovation outcomes while controlling for other important firm characteristics such as age and location.</p>
-<div id="084f2750" class="cell" data-execution_count="8">
+<div id="05abd3df" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize age and age_squared</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> blueprinty.copy()</span>
@@ -667,7 +667,7 @@ Y_i \sim \text{Poisson}(\lambda_i), \quad \text{where } \lambda_i = \exp(X_i^\to
 <p>To estimate the Poisson regression model using a built-in method, I employed the <code>statsmodels</code> library in Python. This approach serves as a validation of the custom maximum likelihood implementation done previously. I began by reconstructing the design matrix ( X ) to include all relevant predictors. Specifically, I included: firm age, the square of firm age (to capture potential non-linear effects), a binary indicator for whether the firm is a Blueprinty customer, and dummy variables for firm region (excluding one region as the baseline category to avoid multicollinearity). I also explicitly added a constant column to allow estimation of an intercept term.</p>
 <p>Once the design matrix was created, I ensured that all values in both the feature matrix and the outcome vector were of type <code>float64</code> to meet the requirements of the <code>statsmodels</code> GLM framework. I then specified and fitted a Poisson generalized linear model using the canonical log link function. The outcome variable was <code>patents</code>, which represents the count of patents awarded to each firm.</p>
 <p>The model was estimated using the <code>GLM()</code> and <code>.fit()</code> methods provided by <code>statsmodels</code>, and the output includes coefficient estimates along with standard errors, z-values, and associated p-values. These results provide a formally estimated Poisson regression model that can be used to interpret how firm characteristics are associated with patent output, while adjusting for potential confounding variables.</p>
-<div id="a17823ef" class="cell" data-execution_count="9">
+<div id="2c5bcf72" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize age and age_squared</span></span>
@@ -730,13 +730,13 @@ Y_i \sim \text{Poisson}(\lambda_i), \quad \text{where } \lambda_i = \exp(X_i^\to
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Date:</td>
-<td>Tue, 06 May 2025</td>
+<td>Mon, 26 May 2025</td>
 <td data-quarto-table-cell-role="th">Deviance:</td>
 <td>2143.3</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Time:</td>
-<td>20:41:24</td>
+<td>18:03:19</td>
 <td data-quarto-table-cell-role="th">Pearson chi2:</td>
 <td>2.07e+03</td>
 </tr>
@@ -866,7 +866,7 @@ Y_i \sim \text{Poisson}(\lambda_i), \quad \text{where } \lambda_i = \exp(X_i^\to
 <p><span class="math display">\[
 \text{Average}(\hat{Y}_1 - \hat{Y}_0) \approx 0.79
 \]</span></p>
-<div id="5b1388b3" class="cell" data-execution_count="10">
+<div id="690e1b4c" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict counterfactuals</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>beta_hat <span class="op">=</span> result.x</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>X_0 <span class="op">=</span> X_df.copy()</span>
@@ -950,7 +950,7 @@ This standard imputation method avoids dropping additional rows and preserves sa
 </ul></li>
 </ol>
 <p>These cleaning steps ensure the dataset is free of nulls in relevant variables and suitable for exploratory data analysis and regression modeling.</p>
-<div id="8516847e" class="cell" data-execution_count="11">
+<div id="2569cfcd" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load data</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"airbnb.csv"</span>)</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1192,7 +1192,7 @@ This standard imputation method avoids dropping additional rows and preserves sa
 <section id="exploratory-analysis-distribution-of-room-types" class="level3">
 <h3 class="anchored" data-anchor-id="exploratory-analysis-distribution-of-room-types">Exploratory Analysis: Distribution of Room Types</h3>
 <p>To understand the types of listings available on Airbnb in New York City, we visualized the distribution of the <code>room_type</code> variable using a bar chart.</p>
-<div id="edd83bbd" class="cell" data-execution_count="12">
+<div id="3d352087" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>room_counts <span class="op">=</span> df[<span class="st">"room_type"</span>].value_counts()</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
@@ -1212,7 +1212,7 @@ This standard imputation method avoids dropping additional rows and preserves sa
 </div>
 <p>The distribution of room types among Airbnb listings in New York City reveals that the vast majority of listings are either <strong>entire homes/apartments</strong> or <strong>private rooms</strong>, each category accounting for nearly 20,000 listings. In contrast, <strong>shared rooms</strong> represent only a small fraction of the market, indicating that such accommodations are relatively uncommon. This pattern suggests that most Airbnb hosts cater to travelers who prioritize privacy, either through full-unit rentals or private sleeping spaces. From a modeling perspective, <strong>room type</strong> is likely to be an informative categorical variable, as it may capture meaningful variation in factors such as price, demand, and guest experience. Accordingly, it should be included in any predictive models of review counts or booking behavior. ### Exploratory Analysis: Distribution of Airbnb Prices</p>
 <p>To explore pricing across Airbnb listings, we examined the distribution of the <code>price</code> variable using a histogram with a kernel density estimate (KDE) overlay.</p>
-<div id="6b6215b4" class="cell" data-execution_count="13">
+<div id="08c6fd0e" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Summary statistics for 'price':"</span>)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"price"</span>].describe())</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1252,7 +1252,7 @@ Name: price, dtype: float64</code></pre>
 <p>These outliers could heavily influence the mean and regression results. It may be useful to filter or winsorize extreme price values in further analysis.</p>
 <p>The initial histogram of Airbnb prices revealed a highly skewed distribution, with some listings priced as high as $10,000 per night. These extreme values are likely outliers and can disproportionately influence summary statistics and regression models.</p>
 <p>To address this, we quantified and removed listings with prices above $1,000:</p>
-<div id="353565ad" class="cell" data-execution_count="14">
+<div id="9607661c" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>high_price_count <span class="op">=</span> (df[<span class="st">"price"</span>] <span class="op">&gt;</span> <span class="dv">1000</span>).<span class="bu">sum</span>()</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of listings with price &gt; 1000: </span><span class="sc">{</span>high_price_count<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[df[<span class="st">"price"</span>] <span class="op">&lt;=</span> <span class="dv">1000</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1262,7 +1262,7 @@ Name: price, dtype: float64</code></pre>
 </div>
 <p>There were <strong>146 listings</strong> identified and removed based on the $1,000 price threshold. These represent high-end, likely luxury properties that are <strong>not representative</strong> of the broader NYC Airbnb market. As the number of listings only contributes to a significantly small amount of the total dataset, by excluding them, we improve model stability, reduce variance, and allow clearer interpretation of pricing trends among typical listings.</p>
 <p>Therefore, we revised on the plot as below:</p>
-<div id="b81f09c2" class="cell" data-execution_count="15">
+<div id="ebf7733f" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>sns.histplot(df[<span class="st">"price"</span>], bins<span class="op">=</span><span class="dv">50</span>, kde<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Distribution of Airbnb Prices"</span>)</span>
@@ -1283,7 +1283,7 @@ Name: price, dtype: float64</code></pre>
 <section id="distribution-of-number-of-reviews" class="level3">
 <h3 class="anchored" data-anchor-id="distribution-of-number-of-reviews">Distribution of Number of Reviews</h3>
 <p>To explore how frequently listings are reviewed on Airbnb, we examined the distribution of the <code>number_of_reviews</code> variable:</p>
-<div id="11ed1822" class="cell" data-execution_count="16">
+<div id="f221949d" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Summary statistics for 'number_of_reviews':"</span>)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"number_of_reviews"</span>].describe())</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1323,7 +1323,7 @@ Name: number_of_reviews, dtype: float64</code></pre>
 </ul>
 <p>From the histogram of <code>number_of_reviews</code>, we observed that the distribution is <strong>extremely right-skewed</strong>. While most listings receive relatively few reviews, there are a small number of listings with exceptionally high review counts.</p>
 <p>To quantify these potential outliers, we examined how many listings had more than 200 reviews:</p>
-<div id="1c3a6d8a" class="cell" data-execution_count="17">
+<div id="82fdfa0e" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>high_review_count <span class="op">=</span> (df[<span class="st">"number_of_reviews"</span>] <span class="op">&gt;</span> <span class="dv">100</span>).<span class="bu">sum</span>()</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of listings with more than 200 reviews: </span><span class="sc">{</span>high_review_count<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1332,7 +1332,7 @@ Name: number_of_reviews, dtype: float64</code></pre>
 </div>
 <p>Only <strong>1,085 listings</strong> have more than 200 reviews, out of tens of thousands of entries. This confirms that <strong>a very small proportion of listings receive a disproportionately large share of reviews</strong>.</p>
 <p>These outliers can heavily influence mean-based metrics and potentially distort model results.Given the extreme right skew of the <code>number_of_reviews</code> variable, we filtered the dataset to only include listings with 100 or fewer reviews — the range where most of the data lies. This allows us to better observe the underlying structure and distribution.</p>
-<div id="9b5b069f" class="cell" data-execution_count="18">
+<div id="34af83b0" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>subset <span class="op">=</span> df[df[<span class="st">"number_of_reviews"</span>] <span class="op">&lt;=</span> <span class="dv">100</span>]</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>sns.histplot(subset[<span class="st">"number_of_reviews"</span>], bins<span class="op">=</span><span class="dv">100</span>, kde<span class="op">=</span><span class="va">True</span>)</span>
@@ -1361,7 +1361,7 @@ Name: number_of_reviews, dtype: float64</code></pre>
 <h3 class="anchored" data-anchor-id="price-vs.-review-score-value">Price vs.&nbsp;Review Score (Value)</h3>
 <p>To explore whether customer-perceived “value for money” correlates with listing price, we visualized the relationship between <code>price</code> and <code>review_scores_value</code> using a scatter plot:</p>
 <p>We plotted each listing’s price against its corresponding <strong>value review score</strong> (1–10 scale). - <code>alpha=0.4</code> was used to reduce overplotting and make dense clusters easier to interpret. - This allows us to visually inspect whether higher prices are associated with lower perceived value, or if highly rated listings tend to be more expensive</p>
-<div id="864a3d88" class="cell" data-execution_count="19">
+<div id="e7deab73" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data<span class="op">=</span>df, x<span class="op">=</span><span class="st">"review_scores_value"</span>, y<span class="op">=</span><span class="st">"price"</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Price vs Review Score (Value)"</span>)</span>
@@ -1398,7 +1398,7 @@ Name: number_of_reviews, dtype: float64</code></pre>
 </section>
 <section id="model-specification-and-estimation" class="level4">
 <h4 class="anchored" data-anchor-id="model-specification-and-estimation">Model Specification and Estimation</h4>
-<div id="255b7697" class="cell" data-execution_count="20">
+<div id="d1e85eec" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df[<span class="st">"number_of_reviews"</span>]</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>columns_needed_for_x <span class="op">=</span> [</span>
@@ -1454,13 +1454,13 @@ Name: number_of_reviews, dtype: float64</code></pre>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Date:</td>
-<td>Tue, 06 May 2025</td>
+<td>Mon, 26 May 2025</td>
 <td data-quarto-table-cell-role="th">Deviance:</td>
 <td>1.1868e+06</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Time:</td>
-<td>20:41:25</td>
+<td>18:03:19</td>
 <td data-quarto-table-cell-role="th">Pearson chi2:</td>
 <td>1.73e+06</td>
 </tr>
