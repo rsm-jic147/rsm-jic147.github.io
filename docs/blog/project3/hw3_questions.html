@@ -265,7 +265,7 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 <i class="callout-icon no-icon"></i>
 </div>
 <div class="callout-body-container">
-<div id="c49ff6be" class="cell" data-execution_count="1">
+<div id="9a6d1fa9" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> itertools <span class="im">import</span> product</span>
@@ -342,7 +342,7 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 <section id="preparing-the-data-for-estimation" class="level2">
 <h2 class="anchored" data-anchor-id="preparing-the-data-for-estimation">3. Preparing the Data for Estimation</h2>
 <p>The “hard part” of the MNL likelihood function is organizing the data, as we need to keep track of 3 dimensions (consumer <span class="math inline">\(i\)</span>, covariate <span class="math inline">\(k\)</span>, and product <span class="math inline">\(j\)</span>) instead of the typical 2 dimensions for cross-sectional regression models (consumer <span class="math inline">\(i\)</span> and covariate <span class="math inline">\(k\)</span>). The fact that each task for each respondent has the same number of alternatives (3) helps. In addition, we need to convert the categorical variables for brand and ads into binary variables.</p>
-<div id="2fad0db4" class="cell" data-execution_count="2">
+<div id="eb8ce985" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>conjoint_data <span class="op">=</span> pd.read_csv(<span class="st">'conjoint_data.csv'</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -369,7 +369,7 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 <section id="estimation-via-maximum-likelihood" class="level2">
 <h2 class="anchored" data-anchor-id="estimation-via-maximum-likelihood">4. Estimation via Maximum Likelihood</h2>
 <p>In this analysis, we estimated a Multinomial Logit (MNL) model using simulated conjoint data on streaming service preferences. We first constructed a design matrix of product attributes—including brand (Netflix, Prime), ad presence, and price—and used consumer choice outcomes to model the probability of product selection. We then defined and maximized the MNL log-likelihood function using scipy.optimize.minimize, obtaining maximum likelihood estimates for the four key part-worth parameters. Standard errors and 95% confidence intervals were calculated using the inverse Hessian of the log-likelihood.</p>
-<div id="5e2d219f" class="cell" data-execution_count="3">
+<div id="a4cbf65a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -475,7 +475,7 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 </div>
 <p>The table presents the estimated coefficients from the Multinomial Logit (MNL) model, capturing how different attributes of streaming services influence consumer choice. The positive coefficient for beta_Netflix (0.94) indicates a strong preference for Netflix over the baseline (Hulu), while beta_Prime (0.50) reflects a moderate preference for Amazon Prime. The negative estimate for beta_Ads (-0.73) confirms that consumers significantly dislike ad-supported plans, and beta_Price (-0.10) shows that higher prices reduce the likelihood of selection, as expected. All coefficients are statistically significant, with 95% confidence intervals that do not include zero, underscoring the robustness of these preference estimates.</p>
 <p>These results are further visualized in the coefficient plot below. The horizontal plot provides a clear visual representation of the estimated part-worth utilities (coefficients) from the Multinomial Logit model, along with their 95% confidence intervals. Each square marker represents the point estimate for a parameter, while the horizontal lines indicate the range of values within which the true coefficient is likely to lie with 95% confidence. The plot confirms that all parameters are statistically significant, as none of the confidence intervals cross the zero line. Notably, Netflix shows the highest positive utility, indicating strong consumer preference, while Ads and Price have negative utilities, reflecting that consumers are averse to advertisements and higher prices. This visualization complements the numeric results by emphasizing both the direction and precision of the estimated effects.</p>
-<div id="5f5c2390" class="cell" data-execution_count="4">
+<div id="e3cb10c0" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -489,7 +489,7 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 <h2 class="anchored" data-anchor-id="estimation-via-bayesian-methods">5. Estimation via Bayesian Methods</h2>
 <p>In this analysis, we implemented a Metropolis-Hastings Markov Chain Monte Carlo (MCMC) sampler to estimate the posterior distribution of parameters in a Multinomial Logit (MNL) model of consumer choice. The model was based on simulated conjoint data in which respondents selected among streaming service options characterized by brand, ad presence, and price. We specified priors consistent with the guidance provided: normal priors with mean zero and standard deviation five for the binary attributes (Netflix, Prime, Ads), and a tighter normal prior with standard deviation one for the continuous price coefficient. Working in log-space, we combined the log-likelihood—previously used in the MLE estimation—with the log-prior to evaluate the log-posterior.</p>
 <p>To approximate the posterior distribution, we ran the MCMC sampler for 11,000 iterations and discarded the first 1,000 as burn-in, retaining the last 10,000 draws for inference. The proposal distribution was set up as a multivariate normal with zero mean and a diagonal covariance matrix, where the proposal variances were tuned separately for each parameter. This allowed the sampler to explore the parameter space efficiently, even in a four-dimensional setting.</p>
-<div id="a3a0e12f" class="cell" data-execution_count="5">
+<div id="630c42e3" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Group structure: each choice set (task) includes 3 rows</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>n_rows <span class="op">=</span> X.shape[<span class="dv">0</span>]</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>n_alts <span class="op">=</span> <span class="dv">3</span></span>
@@ -549,7 +549,7 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 <span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>        samples[step <span class="op">-</span> burn_in] <span class="op">=</span> current_beta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>As part of the diagnostic checks, we examined the trace plot for the beta coefficient on Netflix (<code>β_Netflix</code>), which demonstrated good mixing and no signs of poor convergence or autocorrelation. The histogram of the posterior draws further revealed a roughly symmetric, bell-shaped distribution centered near <strong>0.95</strong>, supporting the interpretation of a strong positive preference for Netflix. Across all four parameters, the posterior means closely aligned with the maximum likelihood estimates obtained earlier, rein_</p>
-<div id="10ed6796" class="cell" data-execution_count="6">
+<div id="a8d03fa9" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
